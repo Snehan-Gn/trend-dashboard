@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import TrendCard from "./components/TrendCard";
+import NoteForm from "./components/NoteForm";
 
 function App() {
   const [trends, setTrends] = useState([]);
@@ -20,6 +21,12 @@ function App() {
       });
   }, []);
 
+  function loadTrend(id) {
+    fetch(`http://localhost:3000/api/trends/${id}`)
+      .then((res) => res.json())
+      .then((data) => setSelected(data));
+  }
+
   if (loading) {
     return <p style={{ padding: "32px" }}>Loading...</p>;
   }
@@ -38,8 +45,8 @@ function App() {
             keyword={trend.keyword}
             score={trend.score}
             rising={trend.rising}
-            onClick={() => setSelected(trend)}
             isSelected={selected?.id === trend.id}
+            onClick={() => loadTrend(trend.id)}
           />
         ))}
       </div>
@@ -47,16 +54,50 @@ function App() {
       {selected && (
         <div
           style={{
-            marginTop: "24px",
-            padding: "20px",
+            marginTop: "32px",
+            padding: "24px",
             border: "1px solid #ddd",
             borderRadius: "8px",
+            maxWidth: "500px",
           }}
         >
           <h2>{selected.keyword}</h2>
           <p>Interest score: {selected.score}/100</p>
-          <p>{selected.note}</p>
-          <button onClick={() => setSelected(null)}>Close</button>
+          <p>Status: {selected.rising ? "Trending up ↑" : "Trending down ↓"}</p>
+
+          <h4 style={{ marginBottom: "8px" }}>Notes</h4>
+          {selected.notes?.length === 0 && (
+            <p style={{ color: "#999" }}>No notes yet.</p>
+          )}
+          {selected.notes?.map((note) => (
+            <div
+              key={note.id}
+              style={{
+                padding: "10px",
+                background: "#f9f9f9",
+                borderRadius: "6px",
+                marginBottom: "8px",
+                fontSize: "14px",
+              }}
+            >
+              <p style={{ margin: 0 }}>{note.content}</p>
+              <p style={{ margin: "4px 0 0", color: "#999", fontSize: "12px" }}>
+                {note.created_at}
+              </p>
+            </div>
+          ))}
+
+          <NoteForm
+            keywordId={selected.id}
+            onNoteSaved={() => loadTrend(selected.id)}
+          />
+
+          <button
+            onClick={() => setSelected(null)}
+            style={{ marginTop: "16px", cursor: "pointer" }}
+          >
+            Close
+          </button>
         </div>
       )}
     </div>
