@@ -8,11 +8,10 @@ function TrendCard({ keyword, score, rising, onClick, isSelected }) {
         padding: "16px",
         width: "200px",
         cursor: "pointer",
-        backgroundColor: isSelected ? "#f5f5f5" : "white",
       }}
     >
       <h3>{keyword}</h3>
-      <p>{score}</p>
+      <p>Score: {score}</p>
       <p>{rising ? "Rising" : "Falling"}</p>
     </div>
   );
