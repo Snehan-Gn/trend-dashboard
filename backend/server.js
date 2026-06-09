@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const cron = require("node-cron");
 const db = require("./db");
+const runFetchTrends = require("./fetchTrends");
 
 const app = express();
 const PORT = 3000;
@@ -8,7 +10,6 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// GET /api/trends — return all keywords with their latest score
 app.get("/api/trends", (req, res) => {
   const trends = db
     .prepare(
@@ -21,8 +22,8 @@ app.get("/api/trends", (req, res) => {
       t.date
     FROM keywords k
     JOIN trends t ON t.keyword_id = k.id
-    WHERE t.id = (
-      SELECT id FROM trends WHERE keyword_id = k.id ORDER BY date DESC, id DESC LIMIT 1
+    WHERE t.date = (
+      SELECT MAX(date) FROM trends WHERE keyword_id = k.id
     )
     ORDER BY t.score DESC
   `,
@@ -32,7 +33,6 @@ app.get("/api/trends", (req, res) => {
   res.json(trends);
 });
 
-// GET /api/trends/:id — return one keyword with its notes
 app.get("/api/trends/:id", (req, res) => {
   const keyword = db
     .prepare("SELECT * FROM keywords WHERE id = ?")
@@ -62,7 +62,6 @@ app.get("/api/trends/:id", (req, res) => {
   res.json({ ...keyword, ...latestTrend, notes });
 });
 
-// POST /api/notes — add a note to a keyword
 app.post("/api/notes", (req, res) => {
   const { keyword_id, content } = req.body;
 
@@ -77,6 +76,36 @@ app.post("/api/notes", (req, res) => {
     .run(keyword_id, content);
 
   res.status(201).json({ id: result.lastInsertRowid, keyword_id, content });
+});
+
+app.post("/api/refresh", async (req, res) => {
+  try {
+    await runFetchTrends();
+    res.json({ message: "Trends updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update trends" });
+  }
+});
+
+app.get("/api/trends/:id/history", (req, res) => {
+  const history = db
+    .prepare(
+      `
+    SELECT score, rising, date
+    FROM trends
+    WHERE keyword_id = ?
+    ORDER BY date ASC
+  `,
+    )
+    .all(req.params.id);
+
+  res.json(history);
+});
+
+runFetchTrends().catch(console.error);
+
+cron.schedule("0 0 * * *", () => {
+  runFetchTrends().catch(console.error);
 });
 
 app.listen(PORT, () => {

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
 import TrendCard from "./components/TrendCard";
 import NoteForm from "./components/NoteForm";
+import Rising from "./pages/Rising";
 
-function App() {
+function Dashboard() {
   const [trends, setTrends] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,14 +13,14 @@ function App() {
 
   useEffect(() => {
     fetch("http://localhost:3000/api/trends")
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
         setTrends(data);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
+        setError("Failed to load trends.");
         setLoading(false);
-        setError(error);
       });
   }, []);
 
@@ -27,18 +30,13 @@ function App() {
       .then((data) => setSelected(data));
   }
 
-  if (loading) {
-    return <p style={{ padding: "32px" }}>Loading...</p>;
-  }
-
-  if (error) {
-    return <p style={{ padding: "32px" }}>Error: {error.message}</p>;
-  }
+  if (loading) return <p style={{ padding: "32px" }}>Loading trends...</p>;
+  if (error) return <p style={{ padding: "32px", color: "red" }}>{error}</p>;
 
   return (
     <div style={{ padding: "32px" }}>
-      <h1>Trend Dashboard</h1>
-      <div style={{ display: "flex", gap: "16px" }}>
+      <h1>Dashboard</h1>
+      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
         {trends.map((trend) => (
           <TrendCard
             key={trend.id}
@@ -98,19 +96,21 @@ function App() {
           >
             Close
           </button>
-
-          <button
-            onClick={() =>
-              fetch("http://localhost:3000/api/refresh", {
-                method: "POST",
-              }).then(() => window.location.reload())
-            }
-          >
-            Refresh trends
-          </button>
         </div>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/rising" element={<Rising />} />
+      </Routes>
+    </>
   );
 }
 

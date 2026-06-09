@@ -6,7 +6,8 @@ from datetime import date
 
 from pytrends.request import TrendReq
 
-conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), "trends.db"))
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "trends.db")
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 cursor.execute("SELECT id, keyword FROM keywords")
@@ -26,29 +27,32 @@ def chunks(lst, n):
         yield lst[i : i + n]
 
 
-for batch in chunks(keywords, 5):
+def fetch_with_retry(keyword_names, max_attempts=4):
+    delay = 10
+    for attempt in range(max_attempts):
+        try:
+            pytrends.build_payload(keyword_names, timeframe="today 3-m", geo="")
+            return pytrends.interest_over_time()
+        except Exception as e:
+            msg = str(e)
+            if "429" in msg and attempt < max_attempts - 1:
+                print(f"Rate limited, waiting {delay}s before retry {attempt + 1}/{max_attempts - 1}...")
+                time.sleep(delay)
+                delay *= 2
+            else:
+                raise
+
+
+batches = list(chunks(keywords, 5))
+for i, batch in enumerate(batches):
+    if i > 0:
+        time.sleep(5)
+
     keyword_ids = [row[0] for row in batch]
     keyword_names = [row[1] for row in batch]
 
-    for attempt in range(3):
-        try:
-            pytrends.build_payload(keyword_names, timeframe="today 3-m", geo="")
-            time.sleep(2)
-            data = pytrends.interest_over_time()
-            break
-        except Exception as e:
-            if attempt < 2:
-                wait = 10 * (attempt + 1)
-                print(f"Attempt {attempt + 1} failed, retrying in {wait}s: {e}")
-                time.sleep(wait)
-            else:
-                print(f"Error fetching {keyword_names}: {e}")
-                data = None
-
-    if data is None:
-        continue
-
     try:
+        data = fetch_with_retry(keyword_names)
 
         if data.empty:
             print(f"No data returned for: {keyword_names}")
@@ -69,11 +73,7 @@ for batch in chunks(keywords, 5):
                 rising = 0
 
             cursor.execute(
-                "DELETE FROM trends WHERE keyword_id = ? AND date = ?",
-                (kid, today),
-            )
-            cursor.execute(
-                "INSERT INTO trends (keyword_id, score, rising, date) VALUES (?, ?, ?, ?)",
+                "INSERT OR REPLACE INTO trends (keyword_id, score, rising, date) VALUES (?, ?, ?, ?)",
                 (kid, score, rising, today),
             )
             print(f"{kname}: score={score}, rising={rising}")
@@ -81,8 +81,6 @@ for batch in chunks(keywords, 5):
     except Exception as e:
         print(f"Error fetching {keyword_names}: {e}")
         continue
-
-    time.sleep(5)
 
 conn.commit()
 conn.close()
