@@ -1,17 +1,6 @@
 import { useState, useEffect } from "react";
 import TrendCard from "./components/TrendCard";
 
-function fakeFetch() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: 1, keyword: "JavaScript", score: 10, rising: true },
-        { id: 2, keyword: "Python", score: 8, rising: false },
-      ]);
-    }, 1000);
-  });
-}
-
 function App() {
   const [trends, setTrends] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -19,7 +8,8 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fakeFetch()
+    fetch("http://localhost:3000/api/trends")
+      .then((response) => response.json())
       .then((data) => {
         setTrends(data);
         setLoading(false);
