@@ -294,6 +294,18 @@ body {
   color: var(--text-3);
 }
 
+.badge-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.trend-pending-label {
+  font-size: 12px;
+  color: var(--text-3);
+  font-style: italic;
+  margin-top: 4px;
+}
+
 /* ---- Score bar ---- */
 
 .trend-score-label {
@@ -478,6 +490,53 @@ body {
 
 .note-textarea::placeholder {
   color: var(--text-3);
+}
+
+/* ---- Keyword Form ---- */
+
+.keyword-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.keyword-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 9px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.keyword-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.keyword-input::placeholder {
+  color: var(--text-3);
+}
+
+.keyword-input:disabled {
+  opacity: 0.6;
+}
+
+.keyword-input-error {
+  border-color: var(--red) !important;
+}
+
+.keyword-error {
+  font-size: 13px;
+  color: var(--red);
+  width: 100%;
 }
 
 /* ---- Rising Page ---- */

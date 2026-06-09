@@ -17,20 +17,37 @@ app.get("/api/trends", (req, res) => {
     SELECT
       k.id,
       k.keyword,
-      t.score,
-      t.rising,
+      COALESCE(t.score, 0)   AS score,
+      COALESCE(t.rising, 0)  AS rising,
       t.date
     FROM keywords k
-    JOIN trends t ON t.keyword_id = k.id
-    WHERE t.date = (
-      SELECT MAX(date) FROM trends WHERE keyword_id = k.id
-    )
-    ORDER BY t.score DESC
+    LEFT JOIN trends t
+      ON t.keyword_id = k.id
+      AND t.date = (SELECT MAX(date) FROM trends WHERE keyword_id = k.id)
+    ORDER BY t.score DESC NULLS LAST
   `,
     )
     .all();
 
   res.json(trends);
+});
+
+app.post("/api/keywords", (req, res) => {
+  const keyword = req.body.keyword?.trim();
+  if (!keyword) {
+    return res.status(400).json({ error: "keyword is required" });
+  }
+  try {
+    const result = db
+      .prepare("INSERT INTO keywords (keyword) VALUES (?)")
+      .run(keyword);
+    res.status(201).json({ id: result.lastInsertRowid, keyword });
+  } catch (err) {
+    if (err.message.includes("UNIQUE constraint")) {
+      return res.status(409).json({ error: "Already tracking this keyword" });
+    }
+    res.status(500).json({ error: "Failed to add keyword" });
+  }
 });
 
 app.get("/api/trends/:id", (req, res) => {

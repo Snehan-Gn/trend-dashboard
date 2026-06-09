@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import TrendCard from "./components/TrendCard";
 import NoteForm from "./components/NoteForm";
+import KeywordForm from "./components/KeywordForm";
 import Rising from "./pages/Rising";
 
 function StatChip({ label, value, color }) {
@@ -99,6 +100,8 @@ function Dashboard() {
         <StatChip label="Updated" value={latestDate} />
       </div>
 
+      <KeywordForm onAdded={loadTrends} />
+
       <div className="cards-grid">
         {trends.map((trend) => (
           <TrendCard
@@ -106,6 +109,7 @@ function Dashboard() {
             keyword={trend.keyword}
             score={trend.score}
             rising={trend.rising}
+            date={trend.date}
             isSelected={selected?.id === trend.id}
             onClick={() => loadTrend(trend.id)}
           />
