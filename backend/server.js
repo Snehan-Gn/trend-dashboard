@@ -102,7 +102,17 @@ app.get("/api/trends/:id/history", (req, res) => {
   res.json(history);
 });
 
-runFetchTrends().catch(console.error);
+function fetchIfStale() {
+  const today = new Date().toISOString().slice(0, 10);
+  const row = db.prepare("SELECT 1 FROM trends WHERE date = ? LIMIT 1").get(today);
+  if (row) {
+    console.log("Trends already up to date for today, skipping fetch.");
+    return;
+  }
+  runFetchTrends().catch(console.error);
+}
+
+fetchIfStale();
 
 cron.schedule("0 0 * * *", () => {
   runFetchTrends().catch(console.error);
