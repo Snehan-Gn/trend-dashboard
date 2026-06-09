@@ -21,8 +21,8 @@ app.get("/api/trends", (req, res) => {
       t.date
     FROM keywords k
     JOIN trends t ON t.keyword_id = k.id
-    WHERE t.date = (
-      SELECT MAX(date) FROM trends WHERE keyword_id = k.id
+    WHERE t.id = (
+      SELECT id FROM trends WHERE keyword_id = k.id ORDER BY date DESC, id DESC LIMIT 1
     )
     ORDER BY t.score DESC
   `,

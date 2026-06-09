@@ -13,7 +13,8 @@ db.exec(`
     score INTEGER NOT NULL,
     rising INTEGER NOT NULL,
     date TEXT NOT NULL,
-    FOREIGN KEY (keyword_id) REFERENCES keywords(id)
+    FOREIGN KEY (keyword_id) REFERENCES keywords(id),
+    UNIQUE(keyword_id, date)
   );
 
   CREATE TABLE IF NOT EXISTS notes (

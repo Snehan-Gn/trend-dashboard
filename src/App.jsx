@@ -98,6 +98,16 @@ function App() {
           >
             Close
           </button>
+
+          <button
+            onClick={() =>
+              fetch("http://localhost:3000/api/refresh", {
+                method: "POST",
+              }).then(() => window.location.reload())
+            }
+          >
+            Refresh trends
+          </button>
         </div>
       )}
     </div>
