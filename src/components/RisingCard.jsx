@@ -15,51 +15,23 @@ function RisingCard({ id, keyword, score }) {
   }, [id]);
 
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "12px",
-        padding: "20px",
-        width: "280px",
-        background: "#fff",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-        }}
-      >
+    <div className="rising-card">
+      <div className="rising-card-top">
         <div>
-          <h3 style={{ margin: "0 0 4px" }}>{keyword}</h3>
-          <p style={{ margin: 0, color: "#666", fontSize: "14px" }}>
+          <div className="rising-keyword">{keyword}</div>
+          <div className="rising-score">
             Score: <strong>{score}</strong>/100
-          </p>
+          </div>
         </div>
-        <span
-          style={{
-            background: "#dcfce7",
-            color: "#15803d",
-            fontSize: "12px",
-            padding: "4px 10px",
-            borderRadius: "99px",
-            fontWeight: 500,
-          }}
-        >
-          ↑ Rising
-        </span>
+        <span className="rising-badge">↑ Rising</span>
       </div>
-
-      <div style={{ marginTop: "16px" }}>
-        {loading ? (
-          <p style={{ color: "#999", fontSize: "13px" }}>Loading chart...</p>
-        ) : history.length < 2 ? (
-          <p style={{ color: "#999", fontSize: "13px" }}>Not enough data yet</p>
-        ) : (
-          <SparkLine data={history} />
-        )}
-      </div>
+      {loading ? (
+        <p className="chart-placeholder">Loading chart…</p>
+      ) : history.length < 2 ? (
+        <p className="chart-placeholder">Not enough data yet</p>
+      ) : (
+        <SparkLine data={history} />
+      )}
     </div>
   );
 }

@@ -9,26 +9,39 @@ function Rising() {
     fetch("http://localhost:3000/api/trends")
       .then((res) => res.json())
       .then((data) => {
-        // Filter only rising keywords
-        const rising = data.filter((t) => t.rising === 1);
-        setTrends(rising);
+        setTrends(data.filter((t) => t.rising === 1));
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p style={{ padding: "32px" }}>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="state-container">
+        <p className="state-label">Loading</p>
+        <div className="loading-dots">
+          <span /><span /><span />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: "32px" }}>
-      <h1>Rising Trends</h1>
-      <p style={{ color: "#666", marginBottom: "24px" }}>
-        Keywords gaining momentum in the last 4 weeks
-      </p>
+    <div className="page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Rising Trends</h1>
+          <p className="page-subtitle">
+            Keywords gaining momentum over the last 4 weeks
+          </p>
+        </div>
+      </div>
 
       {trends.length === 0 ? (
-        <p style={{ color: "#999" }}>No rising trends right now.</p>
+        <div className="state-container" style={{ padding: "60px 0" }}>
+          <p className="empty-label">No rising trends right now.</p>
+        </div>
       ) : (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+        <div className="rising-grid">
           {trends.map((trend) => (
             <RisingCard
               key={trend.id}

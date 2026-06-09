@@ -6,9 +6,7 @@ function NoteForm({ keywordId, onNoteSaved }) {
 
   function handleSave() {
     if (!text.trim()) return;
-
     setSaving(true);
-
     fetch("http://localhost:3000/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -24,27 +22,21 @@ function NoteForm({ keywordId, onNoteSaved }) {
   }
 
   return (
-    <div style={{ marginTop: "16px" }}>
+    <div className="note-form">
       <textarea
+        className="note-textarea"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Add a note about this trend..."
         rows={3}
-        style={{
-          width: "100%",
-          padding: "8px",
-          borderRadius: "6px",
-          border: "1px solid #ddd",
-          resize: "vertical",
-          fontFamily: "inherit",
-        }}
       />
       <button
+        className="btn btn-primary"
         onClick={handleSave}
-        disabled={saving}
-        style={{ marginTop: "8px", padding: "8px 16px", cursor: "pointer" }}
+        disabled={saving || !text.trim()}
+        style={{ marginTop: "10px" }}
       >
-        {saving ? "Saving..." : "Save note"}
+        {saving ? "Saving…" : "Save note"}
       </button>
     </div>
   );

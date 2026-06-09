@@ -1,24 +1,27 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "24px",
-        padding: "12px 32px",
-        borderBottom: "1px solid #e5e7eb",
-        background: "#fff",
-      }}
-    >
-      <span style={{ fontWeight: 700, fontSize: "18px" }}>TrendDash</span>
-      <Link to="/" style={{ textDecoration: "none", color: "#374151" }}>
-        Dashboard
-      </Link>
-      <Link to="/rising" style={{ textDecoration: "none", color: "#374151" }}>
-        Rising
-      </Link>
+    <nav className="navbar">
+      <div className="navbar-brand">
+        <div className="navbar-logo">TD</div>
+        <span className="navbar-title">TrendDash</span>
+      </div>
+      <div className="navbar-links">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+        >
+          Dashboard
+        </NavLink>
+        <NavLink
+          to="/rising"
+          className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+        >
+          Rising
+        </NavLink>
+      </div>
     </nav>
   );
 }
