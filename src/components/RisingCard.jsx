@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_URL } from "../config";
 import SparkLine from "./SparkLine";
 
 function RisingCard({ id, keyword, score }) {
@@ -6,7 +7,7 @@ function RisingCard({ id, keyword, score }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/trends/${id}/history`)
+    fetch(`${API_URL}/api/trends/${id}/history`)
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);

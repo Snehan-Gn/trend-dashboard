@@ -1,11 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Routes, Route } from "react-router-dom";
+import { API_URL } from "./config";
 import Navbar from "./components/Navbar";
 import TrendCard from "./components/TrendCard";
 import NoteForm from "./components/NoteForm";
 import KeywordForm from "./components/KeywordForm";
 import HistoryChart from "./components/HistoryChart";
 import Rising from "./pages/Rising";
+
+const SORT_OPTIONS = [
+  { value: "score-desc", label: "Score (High → Low)" },
+  { value: "score-asc", label: "Score (Low → High)" },
+  { value: "name-asc", label: "Name (A–Z)" },
+  { value: "name-desc", label: "Name (Z–A)" },
+  { value: "rising", label: "Rising first" },
+];
+
+function sortTrends(trends, sortBy) {
+  const sorted = [...trends];
+  switch (sortBy) {
+    case "score-asc":
+      sorted.sort((a, b) => a.score - b.score);
+      break;
+    case "name-asc":
+      sorted.sort((a, b) => a.keyword.localeCompare(b.keyword));
+      break;
+    case "name-desc":
+      sorted.sort((a, b) => b.keyword.localeCompare(a.keyword));
+      break;
+    case "rising":
+      sorted.sort((a, b) => b.rising - a.rising || b.score - a.score);
+      break;
+    default:
+      sorted.sort((a, b) => b.score - a.score);
+  }
+  // Pinned favorites always float to the top, in their sorted order.
+  sorted.sort((a, b) => b.favorite - a.favorite);
+  return sorted;
+}
 
 function StatChip({ label, value, color }) {
   return (
@@ -24,9 +56,10 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [sortBy, setSortBy] = useState("score-desc");
 
   function loadTrends() {
-    return fetch("http://localhost:3000/api/trends")
+    return fetch(`${API_URL}/api/trends`)
       .then((res) => res.json())
       .then((data) => {
         setTrends(data);
@@ -41,17 +74,34 @@ function Dashboard() {
   useEffect(() => { loadTrends(); }, []);
 
   function loadTrend(id) {
-    fetch(`http://localhost:3000/api/trends/${id}`)
+    fetch(`${API_URL}/api/trends/${id}`)
       .then((res) => res.json())
       .then((data) => setSelected(data));
   }
 
   function handleRefresh() {
     setRefreshing(true);
-    fetch("http://localhost:3000/api/refresh", { method: "POST" })
+    fetch(`${API_URL}/api/refresh`, { method: "POST" })
       .then(() => loadTrends())
       .finally(() => setRefreshing(false));
   }
+
+  function handleDelete(id) {
+    if (!window.confirm("Remove this keyword and its history?")) return;
+
+    fetch(`${API_URL}/api/keywords/${id}`, { method: "DELETE" })
+      .then(() => {
+        if (selected?.id === id) setSelected(null);
+        loadTrends();
+      });
+  }
+
+  function handleToggleFavorite(id) {
+    fetch(`${API_URL}/api/keywords/${id}/favorite`, { method: "PATCH" })
+      .then(() => loadTrends());
+  }
+
+  const sortedTrends = useMemo(() => sortTrends(trends, sortBy), [trends, sortBy]);
 
   const risingCount = trends.filter((t) => t.rising).length;
   const avgScore = trends.length
@@ -86,13 +136,27 @@ function Dashboard() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">{trends.length} keywords tracked</p>
         </div>
-        <button
-          className="btn btn-ghost"
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          {refreshing ? "↻ Refreshing…" : "↻ Refresh"}
-        </button>
+        <div className="page-header-actions">
+          <select
+            className="sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort keywords"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                Sort: {opt.label}
+              </option>
+            ))}
+          </select>
+          <button
+            className="btn btn-ghost"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? "↻ Refreshing…" : "↻ Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="stats-row">
@@ -105,7 +169,7 @@ function Dashboard() {
       <KeywordForm onAdded={loadTrends} />
 
       <div className="cards-grid">
-        {trends.map((trend, i) => (
+        {sortedTrends.map((trend, i) => (
           <TrendCard
             key={trend.id}
             index={i}
@@ -113,8 +177,11 @@ function Dashboard() {
             score={trend.score}
             rising={trend.rising}
             date={trend.date}
+            favorite={!!trend.favorite}
             isSelected={selected?.id === trend.id}
             onClick={() => loadTrend(trend.id)}
+            onDelete={() => handleDelete(trend.id)}
+            onToggleFavorite={() => handleToggleFavorite(trend.id)}
           />
         ))}
       </div>

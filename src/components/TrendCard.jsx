@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function TrendCard({ index, keyword, score, rising, date, onClick, isSelected }) {
+function TrendCard({ index, keyword, score, rising, date, favorite, onClick, onDelete, onToggleFavorite, isSelected }) {
   const [barWidth, setBarWidth] = useState(0);
   const hasData = date != null;
 
@@ -12,7 +12,7 @@ function TrendCard({ index, keyword, score, rising, date, onClick, isSelected })
 
   return (
     <div
-      className={`trend-card${isSelected ? " selected" : ""}`}
+      className={`trend-card${isSelected ? " selected" : ""}${favorite ? " favorite" : ""}`}
       onClick={onClick}
     >
       <div className="trend-card-top">
@@ -20,13 +20,37 @@ function TrendCard({ index, keyword, score, rising, date, onClick, isSelected })
           <div className="trend-card-index">{String(index + 1).padStart(2, "0")}</div>
           <span className="trend-keyword">{keyword}</span>
         </div>
-        {hasData ? (
-          <span className={`badge ${rising ? "badge-rising" : "badge-flat"}`}>
-            {rising ? "↑ Rising" : "Stable"}
-          </span>
-        ) : (
-          <span className="badge badge-pending">Pending</span>
-        )}
+        <div className="trend-card-actions">
+          {hasData ? (
+            <span className={`badge ${rising ? "badge-rising" : "badge-flat"}`}>
+              {rising ? "↑ Rising" : "Stable"}
+            </span>
+          ) : (
+            <span className="badge badge-pending">Pending</span>
+          )}
+          <button
+            className={`trend-favorite-btn${favorite ? " active" : ""}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            aria-label={favorite ? `Unpin ${keyword}` : `Pin ${keyword}`}
+            title={favorite ? "Unpin" : "Pin to top"}
+          >
+            {favorite ? "★" : "☆"}
+          </button>
+          <button
+            className="trend-delete-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            aria-label={`Remove ${keyword}`}
+            title="Remove keyword"
+          >
+            ×
+          </button>
+        </div>
       </div>
       {hasData ? (
         <div>

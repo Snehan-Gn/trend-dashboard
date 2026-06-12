@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { API_URL } from "../config";
 import {
   AreaChart,
   Area,
@@ -48,7 +49,7 @@ function HistoryChart({ id }) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3000/api/trends/${id}/history`)
+    fetch(`${API_URL}/api/trends/${id}/history`)
       .then((res) => res.json())
       .then((d) => {
         setData(d);

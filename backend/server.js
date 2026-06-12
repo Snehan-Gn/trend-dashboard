@@ -5,7 +5,7 @@ const db = require("./db");
 const runFetchTrends = require("./fetchTrends");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -17,6 +17,7 @@ app.get("/api/trends", (req, res) => {
     SELECT
       k.id,
       k.keyword,
+      k.favorite,
       COALESCE(t.score, 0)   AS score,
       COALESCE(t.rising, 0)  AS rising,
       t.date
@@ -24,7 +25,7 @@ app.get("/api/trends", (req, res) => {
     LEFT JOIN trends t
       ON t.keyword_id = k.id
       AND t.date = (SELECT MAX(date) FROM trends WHERE keyword_id = k.id)
-    ORDER BY t.score DESC NULLS LAST
+    ORDER BY k.favorite DESC, t.score DESC NULLS LAST
   `,
     )
     .all();
@@ -49,6 +50,40 @@ app.post("/api/keywords", (req, res) => {
     }
     res.status(500).json({ error: "Failed to add keyword" });
   }
+});
+
+app.patch("/api/keywords/:id/favorite", (req, res) => {
+  const keyword = db
+    .prepare("SELECT id, favorite FROM keywords WHERE id = ?")
+    .get(req.params.id);
+
+  if (!keyword) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  const favorite = keyword.favorite ? 0 : 1;
+  db.prepare("UPDATE keywords SET favorite = ? WHERE id = ?").run(
+    favorite,
+    req.params.id,
+  );
+
+  res.json({ id: keyword.id, favorite: favorite === 1 });
+});
+
+app.delete("/api/keywords/:id", (req, res) => {
+  const keyword = db
+    .prepare("SELECT id FROM keywords WHERE id = ?")
+    .get(req.params.id);
+
+  if (!keyword) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  db.prepare("DELETE FROM notes WHERE keyword_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM trends WHERE keyword_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM keywords WHERE id = ?").run(req.params.id);
+
+  res.status(204).end();
 });
 
 app.get("/api/trends/:id", (req, res) => {

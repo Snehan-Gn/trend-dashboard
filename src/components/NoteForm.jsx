@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../config";
 
 function NoteForm({ keywordId, onNoteSaved }) {
   const [text, setText] = useState("");
@@ -7,7 +8,7 @@ function NoteForm({ keywordId, onNoteSaved }) {
   function handleSave() {
     if (!text.trim()) return;
     setSaving(true);
-    fetch("http://localhost:3000/api/notes", {
+    fetch(`${API_URL}/api/notes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ keyword_id: keywordId, content: text }),

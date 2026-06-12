@@ -11,7 +11,8 @@ db.pragma("busy_timeout = 5000");
 db.exec(`
   CREATE TABLE IF NOT EXISTS keywords (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    keyword TEXT NOT NULL UNIQUE
+    keyword TEXT NOT NULL UNIQUE,
+    favorite INTEGER NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS trends (
@@ -25,7 +26,15 @@ db.exec(`
   );
 
   CREATE UNIQUE INDEX IF NOT EXISTS idx_trends_keyword_date ON trends(keyword_id, date);
+`);
 
+// Migration for databases created before the favorite column existed.
+const keywordColumns = db.prepare("PRAGMA table_info(keywords)").all();
+if (!keywordColumns.some((c) => c.name === "favorite")) {
+  db.exec("ALTER TABLE keywords ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0");
+}
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     keyword_id INTEGER NOT NULL,

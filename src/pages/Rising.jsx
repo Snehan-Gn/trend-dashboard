@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_URL } from "../config";
 import RisingCard from "../components/RisingCard";
 
 function Rising() {
@@ -6,7 +7,7 @@ function Rising() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/trends")
+    fetch(`${API_URL}/api/trends`)
       .then((res) => res.json())
       .then((data) => {
         setTrends(data.filter((t) => t.rising === 1));

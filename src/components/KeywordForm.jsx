@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../config";
 
 function KeywordForm({ onAdded }) {
   const [value, setValue] = useState("");
@@ -13,7 +14,7 @@ function KeywordForm({ onAdded }) {
     setAdding(true);
     setError(null);
 
-    fetch("http://localhost:3000/api/keywords", {
+    fetch(`${API_URL}/api/keywords`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ keyword }),
