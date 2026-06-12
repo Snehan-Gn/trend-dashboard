@@ -6,31 +6,31 @@ function SparkLine({ data }) {
       <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+            <stop offset="5%" stopColor="#be3b2c" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#be3b2c" stopOpacity={0} />
           </linearGradient>
         </defs>
         <Area
           type="monotone"
           dataKey="score"
-          stroke="#10b981"
+          stroke="#be3b2c"
           strokeWidth={2}
           fill="url(#sparkGrad)"
           dot={false}
-          activeDot={{ r: 3, fill: "#10b981", strokeWidth: 0 }}
+          activeDot={{ r: 3, fill: "#be3b2c", strokeWidth: 0 }}
         />
         <Tooltip
           contentStyle={{
-            background: "#181d2c",
-            border: "1px solid rgba(255,255,255,0.13)",
-            borderRadius: "8px",
+            background: "#1c1a17",
+            border: "1px solid #1c1a17",
+            borderRadius: "2px",
             fontSize: "12px",
-            color: "#f1f5f9",
+            fontFamily: "'IBM Plex Mono', monospace",
+            color: "#fbf8f1",
             padding: "6px 10px",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
           }}
-          itemStyle={{ color: "#10b981" }}
-          labelStyle={{ color: "#64748b", marginBottom: "2px" }}
+          itemStyle={{ color: "#be3b2c" }}
+          labelStyle={{ color: "#a89c8d", marginBottom: "2px" }}
           formatter={(v) => [v, "Score"]}
         />
       </AreaChart>

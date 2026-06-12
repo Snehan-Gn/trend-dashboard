@@ -4,8 +4,9 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <div className="navbar-logo">TD</div>
-        <span className="navbar-title">TrendDash</span>
+        <span className="navbar-mark">
+          TREND<span className="navbar-slash">/</span>LINE
+        </span>
       </div>
       <div className="navbar-links">
         <NavLink
@@ -22,6 +23,7 @@ function Navbar() {
           Rising
         </NavLink>
       </div>
+      <span className="navbar-meta">Vol. 01 — Street Signals</span>
     </nav>
   );
 }

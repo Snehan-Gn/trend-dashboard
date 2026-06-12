@@ -82,6 +82,7 @@ function Dashboard() {
     <div className="page">
       <div className="page-header">
         <div>
+          <p className="page-kicker">Field Report — Live Index</p>
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">{trends.length} keywords tracked</p>
         </div>
@@ -96,7 +97,7 @@ function Dashboard() {
 
       <div className="stats-row">
         <StatChip label="Keywords" value={trends.length} />
-        <StatChip label="Rising" value={risingCount} color="var(--green)" />
+        <StatChip label="Rising" value={risingCount} color="var(--accent)" />
         <StatChip label="Avg score" value={avgScore} />
         <StatChip label="Updated" value={latestDate} />
       </div>
@@ -104,9 +105,10 @@ function Dashboard() {
       <KeywordForm onAdded={loadTrends} />
 
       <div className="cards-grid">
-        {trends.map((trend) => (
+        {trends.map((trend, i) => (
           <TrendCard
             key={trend.id}
+            index={i}
             keyword={trend.keyword}
             score={trend.score}
             rising={trend.rising}
@@ -121,6 +123,7 @@ function Dashboard() {
         <div className="detail-panel">
           <div className="detail-header">
             <div>
+              <p className="detail-kicker">Trend Report</p>
               <h2 className="detail-keyword">{selected.keyword}</h2>
               <div className="detail-meta">
                 <span className="detail-score">

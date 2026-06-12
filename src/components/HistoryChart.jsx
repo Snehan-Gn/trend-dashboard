@@ -99,27 +99,27 @@ function HistoryChart({ id }) {
           >
             <defs>
               <linearGradient id="histGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.25} />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                <stop offset="0%" stopColor="#be3b2c" stopOpacity={0.18} />
+                <stop offset="100%" stopColor="#be3b2c" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.05)"
+              strokeDasharray="2 4"
+              stroke="rgba(28,26,23,0.14)"
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={formatTick}
               interval={tickInterval(filtered.length)}
-              tick={{ fill: "#64748b", fontSize: 11 }}
+              tick={{ fill: "#a89c8d", fontSize: 11 }}
               tickLine={false}
-              axisLine={false}
+              axisLine={{ stroke: "rgba(28,26,23,0.4)" }}
             />
             <YAxis
               domain={[0, 100]}
               tickCount={5}
-              tick={{ fill: "#64748b", fontSize: 11 }}
+              tick={{ fill: "#a89c8d", fontSize: 11 }}
               tickLine={false}
               axisLine={false}
             />
@@ -127,11 +127,11 @@ function HistoryChart({ id }) {
             <Area
               type="monotone"
               dataKey="score"
-              stroke="#6366f1"
+              stroke="#be3b2c"
               strokeWidth={2.5}
               fill="url(#histGrad)"
               dot={false}
-              activeDot={{ r: 4, fill: "#818cf8", strokeWidth: 0 }}
+              activeDot={{ r: 4, fill: "#be3b2c", strokeWidth: 0 }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -18,6 +18,8 @@ db.exec(`
     UNIQUE(keyword_id, date)
   );
 
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_trends_keyword_date ON trends(keyword_id, date);
+
   CREATE TABLE IF NOT EXISTS notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     keyword_id INTEGER NOT NULL,

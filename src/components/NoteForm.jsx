@@ -34,7 +34,7 @@ function NoteForm({ keywordId, onNoteSaved }) {
         className="btn btn-primary"
         onClick={handleSave}
         disabled={saving || !text.trim()}
-        style={{ marginTop: "10px" }}
+        style={{ marginTop: "16px" }}
       >
         {saving ? "Saving…" : "Save note"}
       </button>

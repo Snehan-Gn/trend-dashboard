@@ -40,7 +40,10 @@ def fetch_with_retry(keyword_names, max_attempts=4):
                 raise
 
 
-batches = list(chunks(keywords, 5))
+# One keyword per request: pytrends normalizes scores 0-100 relative to the
+# highest-volume term in a batch, so batching keywords together would let a
+# single high-volume term crush every other keyword's score toward 0.
+batches = list(chunks(keywords, 1))
 for i, batch in enumerate(batches):
     if i > 0:
         time.sleep(5)

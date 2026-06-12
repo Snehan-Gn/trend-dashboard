@@ -33,14 +33,20 @@ function KeywordForm({ onAdded }) {
 
   return (
     <form className="keyword-form" onSubmit={handleSubmit}>
-      <input
-        className={`keyword-input${error ? " keyword-input-error" : ""}`}
-        type="text"
-        value={value}
-        onChange={(e) => { setValue(e.target.value); setError(null); }}
-        placeholder="Add a keyword — e.g. Y2K fashion"
-        disabled={adding}
-      />
+      <div className="keyword-form-field">
+        <label className="keyword-form-label" htmlFor="keyword-input">
+          Track a new keyword
+        </label>
+        <input
+          id="keyword-input"
+          className={`keyword-input${error ? " keyword-input-error" : ""}`}
+          type="text"
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setError(null); }}
+          placeholder="e.g. Y2K fashion"
+          disabled={adding}
+        />
+      </div>
       <button
         className="btn btn-primary"
         type="submit"

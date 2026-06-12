@@ -29,7 +29,8 @@ function Rising() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Rising Trends</h1>
+          <p className="page-kicker">Field Report — On the Rise</p>
+          <h1 className="page-title">Rising</h1>
           <p className="page-subtitle">
             Keywords gaining momentum over the last 4 weeks
           </p>

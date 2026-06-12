@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function TrendCard({ keyword, score, rising, date, onClick, isSelected }) {
+function TrendCard({ index, keyword, score, rising, date, onClick, isSelected }) {
   const [barWidth, setBarWidth] = useState(0);
   const hasData = date != null;
 
@@ -16,7 +16,10 @@ function TrendCard({ keyword, score, rising, date, onClick, isSelected }) {
       onClick={onClick}
     >
       <div className="trend-card-top">
-        <span className="trend-keyword">{keyword}</span>
+        <div>
+          <div className="trend-card-index">{String(index + 1).padStart(2, "0")}</div>
+          <span className="trend-keyword">{keyword}</span>
+        </div>
         {hasData ? (
           <span className={`badge ${rising ? "badge-rising" : "badge-flat"}`}>
             {rising ? "↑ Rising" : "Stable"}
