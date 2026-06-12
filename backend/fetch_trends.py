@@ -82,10 +82,11 @@ for i, batch in enumerate(batches):
 
             print(f"{kname}: {saved} data points saved")
 
+        conn.commit()
+
     except Exception as e:
         print(f"Error fetching {keyword_names}: {e}")
         continue
 
-conn.commit()
 conn.close()
 print("Done.")

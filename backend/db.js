@@ -2,6 +2,12 @@ const Database = require("better-sqlite3");
 const path = require("path");
 const db = new Database(path.join(__dirname, "trends.db"));
 
+// WAL mode lets reads/writes from this process and fetch_trends.py overlap
+// without "database is locked" errors; busy_timeout retries briefly if a
+// write still collides instead of failing immediately.
+db.pragma("journal_mode = WAL");
+db.pragma("busy_timeout = 5000");
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS keywords (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

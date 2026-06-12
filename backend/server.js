@@ -42,6 +42,7 @@ app.post("/api/keywords", (req, res) => {
       .prepare("INSERT INTO keywords (keyword) VALUES (?)")
       .run(keyword);
     res.status(201).json({ id: result.lastInsertRowid, keyword });
+    runFetchTrends().catch(console.error);
   } catch (err) {
     if (err.message.includes("UNIQUE constraint")) {
       return res.status(409).json({ error: "Already tracking this keyword" });
