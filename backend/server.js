@@ -76,7 +76,7 @@ app.get("/api/trends/:id", (req, res) => {
     )
     .all(req.params.id);
 
-  res.json({ ...keyword, ...latestTrend, notes });
+  res.json({ ...latestTrend, ...keyword, notes });
 });
 
 app.post("/api/notes", (req, res) => {

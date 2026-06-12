@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import TrendCard from "./components/TrendCard";
 import NoteForm from "./components/NoteForm";
 import KeywordForm from "./components/KeywordForm";
+import HistoryChart from "./components/HistoryChart";
 import Rising from "./pages/Rising";
 
 function StatChip({ label, value, color }) {
@@ -134,6 +135,8 @@ function Dashboard() {
               ×
             </button>
           </div>
+
+          <HistoryChart id={selected.id} />
 
           <div className="notes-section">
             <p className="notes-title">Notes</p>

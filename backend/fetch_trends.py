@@ -2,7 +2,6 @@ import os
 import sqlite3
 import sys
 import time
-from datetime import date
 
 from pytrends.request import TrendReq
 
@@ -18,8 +17,6 @@ if not keywords:
     sys.exit(0)
 
 pytrends = TrendReq(hl="en-US", tz=360, timeout=(10, 25))
-
-today = date.today().isoformat()
 
 
 def chunks(lst, n):
@@ -58,25 +55,29 @@ for i, batch in enumerate(batches):
             print(f"No data returned for: {keyword_names}")
             continue
 
-        latest = data.iloc[-1]
+        # Drop the isPartial flag column — it's metadata, not a keyword
+        if "isPartial" in data.columns:
+            data = data.drop(columns=["isPartial"])
 
         for kid, kname in zip(keyword_ids, keyword_names):
-            if kname not in latest:
+            if kname not in data.columns:
                 continue
 
-            score = int(latest[kname])
+            series = data[kname]
+            saved = 0
 
-            if len(data) >= 4:
-                older_score = int(data.iloc[-4][kname])
-                rising = 1 if score > older_score else 0
-            else:
-                rising = 0
+            for i, (date_idx, val) in enumerate(series.items()):
+                score = int(val)
+                date_str = date_idx.date().isoformat()
+                rising = 1 if (i > 0 and score > int(series.iloc[i - 1])) else 0
 
-            cursor.execute(
-                "INSERT OR REPLACE INTO trends (keyword_id, score, rising, date) VALUES (?, ?, ?, ?)",
-                (kid, score, rising, today),
-            )
-            print(f"{kname}: score={score}, rising={rising}")
+                cursor.execute(
+                    "INSERT OR REPLACE INTO trends (keyword_id, score, rising, date) VALUES (?, ?, ?, ?)",
+                    (kid, score, rising, date_str),
+                )
+                saved += 1
+
+            print(f"{kname}: {saved} data points saved")
 
     except Exception as e:
         print(f"Error fetching {keyword_names}: {e}")
