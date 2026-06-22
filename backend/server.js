@@ -135,7 +135,7 @@ app.post("/api/refresh", async (req, res) => {
   try {
     await runFetchTrends();
     res.json({ message: "Trends updated successfully" });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to update trends" });
   }
 });
